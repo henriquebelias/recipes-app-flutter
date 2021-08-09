@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:recipes_app/drinkDetails.dart';
 import 'package:recipes_app/explore.dart';
-
 import 'package:recipes_app/home.dart';
-import 'package:recipes_app/mealDetails.dart';
-import 'package:recipes_app/meals.dart';
-import 'package:recipes_app/drinks.dart';
+import 'package:recipes_app/recipeDetails.dart';
+import 'package:recipes_app/recipes.dart';
+import 'package:recipes_app/utils/options.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,11 +19,21 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (context) => MyHomePage(title: 'Recipes App'),
-        '/meals': (context) => MealsPage(title: 'Meals'),
-        '/drinks': (context) => DrinksPage(title: 'Drinks'),
+        '/meals': (context) => RecipesPage(
+              title: mealOptions['title'],
+              fetch: mealOptions['fetch'],
+            ),
+        '/drinks': (context) => RecipesPage(
+              title: drinkOptions['title'],
+              fetch: drinkOptions['fetch'],
+            ),
         '/explore': (context) => ExplorePage(title: 'Explore'),
-        '/meal/details': (context) => MealDetails(),
-        '/drink/details': (context) => DrinkDetails(),
+        '/meal/details': (context) => RecipeDetails(
+              fetch: mealDetailOptions['fetch'],
+            ),
+        '/drink/details': (context) => RecipeDetails(
+              fetch: drinkDetailOptions['fetch'],
+            ),
       },
     );
   }

@@ -1,51 +1,11 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:recipes_app/utils/Meal.dart';
 
-typedef Json = Map<String, dynamic>;
-
-class Meal {
-  final String idMeal;
-  final String strMeal;
-  final String strMealThumb;
-
-  const Meal({
-    required this.idMeal,
-    required this.strMeal,
-    required this.strMealThumb,
-  });
-
-  factory Meal.fromJson(Json json) {
-    return Meal(
-      idMeal: json['idMeal'] as String,
-      strMeal: json['strMeal'] as String,
-      strMealThumb: json['strMealThumb'] as String,
-    );
-  }
-}
-
-Future<List<Meal>> fetchMeals() async {
-  final response = await http.get(
-    Uri.parse('https://www.themealdb.com/api/json/v1/1/search.php?s='),
-  );
-
-  return compute(parseMeals, response.body);
-}
-
-List<Meal> parseMeals(String responseBody) {
-  final parsed = jsonDecode(responseBody);
-
-  final mealsObj = parsed['meals'].cast<Json>();
-
-  return mealsObj.map<Meal>((json) => Meal.fromJson(json)).toList();
-}
-
-class MealsPage extends StatelessWidget {
-  MealsPage({required this.title});
+class RecipesPage extends StatelessWidget {
+  RecipesPage({required this.title, required this.fetch});
 
   final String title;
+  final Function fetch;
 
   @override
   Widget build(BuildContext context) {
@@ -75,15 +35,15 @@ class MealsPage extends StatelessWidget {
           ],
         ),
       ),
-      body: FutureBuilder<List<Meal>>(
-        future: fetchMeals(),
+      body: FutureBuilder(
+        future: fetch(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(
               child: Text('An error has occurred!'),
             );
           } else if (snapshot.hasData) {
-            return MealsList(meals: snapshot.data!);
+            return RecipesList(recipes: snapshot.data!);
           } else {
             return const Center(
               child: CircularProgressIndicator(),
@@ -107,7 +67,7 @@ class MealsPage extends StatelessWidget {
             label: 'Meals',
           ),
         ],
-        currentIndex: 2,
+        currentIndex: title == 'Meals' ? 2 : 0,
         onTap: (index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/drinks');
@@ -124,10 +84,10 @@ class MealsPage extends StatelessWidget {
   }
 }
 
-class MealsList extends StatelessWidget {
-  const MealsList({Key? key, required this.meals}) : super(key: key);
+class RecipesList extends StatelessWidget {
+  const RecipesList({Key? key, required this.recipes}) : super(key: key);
 
-  final List<Meal> meals;
+  final recipes;
 
   @override
   Widget build(BuildContext context) {
@@ -135,24 +95,34 @@ class MealsList extends StatelessWidget {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
       ),
-      itemCount: meals.length,
+      itemCount: recipes.length,
       itemBuilder: (context, index) {
         return InkWell(
           onTap: () => Navigator.pushNamed(
             context,
-            '/meal/details',
-            arguments: meals[index].idMeal,
+            recipes[index] is Meal ? '/meal/details' : '/drink/details',
+            arguments: recipes[index] is Meal
+                ? recipes[index].idMeal
+                : recipes[index].idDrink,
           ),
           child: Container(
             padding: EdgeInsets.only(top: 16),
             child: Column(
               children: [
                 Expanded(
-                  child: Image.network(meals[index].strMealThumb),
+                  child: Image.network(
+                    recipes[index] is Meal
+                        ? recipes[index].strMealThumb
+                        : recipes[index].strDrinkThumb,
+                  ),
                 ),
                 Container(
                   padding: EdgeInsets.only(top: 10),
-                  child: Text(meals[index].strMeal),
+                  child: Text(
+                    recipes[index] is Meal
+                        ? recipes[index].strMeal
+                        : recipes[index].strDrink,
+                  ),
                 ),
               ],
             ),

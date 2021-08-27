@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipes_app/utils/Meal.dart';
+import 'package:recipes_app/utils/recipeMap.dart';
 
 class RecipesPage extends StatelessWidget {
   RecipesPage({required this.title, required this.fetch});
@@ -97,32 +98,25 @@ class RecipesList extends StatelessWidget {
       ),
       itemCount: recipes.length,
       itemBuilder: (context, index) {
+        final recipeMap = recipes[index] is Meal
+            ? createMealMap(recipes[index])
+            : createDrinkMap(recipes[index]);
         return InkWell(
           onTap: () => Navigator.pushNamed(
             context,
-            recipes[index] is Meal ? '/meal/details' : '/drink/details',
-            arguments: recipes[index] is Meal
-                ? recipes[index].idMeal
-                : recipes[index].idDrink,
+            recipeMap['route'],
+            arguments: recipeMap['id'],
           ),
           child: Container(
             padding: EdgeInsets.only(top: 16),
             child: Column(
               children: [
                 Expanded(
-                  child: Image.network(
-                    recipes[index] is Meal
-                        ? recipes[index].strMealThumb
-                        : recipes[index].strDrinkThumb,
-                  ),
+                  child: Image.network(recipeMap['thumb']),
                 ),
                 Container(
                   padding: EdgeInsets.only(top: 10),
-                  child: Text(
-                    recipes[index] is Meal
-                        ? recipes[index].strMeal
-                        : recipes[index].strDrink,
-                  ),
+                  child: Text(recipeMap['title']),
                 ),
               ],
             ),

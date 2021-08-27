@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:recipes_app/utils/MealDetail.dart';
+import 'package:recipes_app/utils/Meal.dart';
+import 'package:recipes_app/utils/recipeMap.dart';
 
 class RecipeDetails extends StatelessWidget {
   const RecipeDetails({required this.fetch});
@@ -43,13 +44,16 @@ class RecipeDetailsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final recipeMap = recipe[0] is Meal
+        ? createMealMap(recipe[0])
+        : createDrinkMap(recipe[0]);
     return ListView(
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
             child: Text(
-              recipe[0] is MealDetail ? recipe[0].strMeal : recipe[0].strDrink,
+              recipeMap['title'],
               style: Theme.of(context).textTheme.headline3,
             ),
           ),
@@ -63,14 +67,12 @@ class RecipeDetailsList extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
-            child: Text(recipe[0] is MealDetail ? recipe[0].strArea : ''),
+            child: Text(recipeMap['area']),
           ),
         ),
         Center(
           child: Image.network(
-            recipe[0] is MealDetail
-                ? recipe[0].strMealThumb
-                : recipe[0].strDrinkThumb,
+            recipeMap['thumb'],
             width: 350,
           ),
         ),

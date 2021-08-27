@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:recipes_app/utils/Drink.dart';
-import 'package:recipes_app/utils/DrinkDetail.dart';
 import 'package:recipes_app/utils/Meal.dart';
-import 'package:recipes_app/utils/MealDetail.dart';
 
 typedef Json = Map<String, dynamic>;
 
@@ -44,7 +42,7 @@ List<Drink> parseDrinks(String responseBody) {
 }
 
 // Fetch a meal details
-Future<List<MealDetail>> fetchMealDetails(id) async {
+Future<List<Meal>> fetchMealDetails(id) async {
   final response = await http.get(
     Uri.parse('https://www.themealdb.com/api/json/v1/1/lookup.php?i=$id'),
   );
@@ -52,18 +50,16 @@ Future<List<MealDetail>> fetchMealDetails(id) async {
   return compute(parseMealDetails, response.body);
 }
 
-List<MealDetail> parseMealDetails(String responseBody) {
+List<Meal> parseMealDetails(String responseBody) {
   final parsed = jsonDecode(responseBody);
 
   final mealDetailObj = parsed['meals'].cast<Json>();
 
-  return mealDetailObj
-      .map<MealDetail>((json) => MealDetail.fromJson(json))
-      .toList();
+  return mealDetailObj.map<Meal>((json) => Meal.fromJson(json)).toList();
 }
 
 // Fetch a drink details
-Future<List<DrinkDetail>> fetchDrinkDetails(id) async {
+Future<List<Drink>> fetchDrinkDetails(id) async {
   final response = await http.get(
     Uri.parse('https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=$id'),
   );
@@ -71,12 +67,10 @@ Future<List<DrinkDetail>> fetchDrinkDetails(id) async {
   return compute(parseDrinkDetails, response.body);
 }
 
-List<DrinkDetail> parseDrinkDetails(String responseBody) {
+List<Drink> parseDrinkDetails(String responseBody) {
   final parsed = jsonDecode(responseBody);
 
   final drinkDetailObj = parsed['drinks'].cast<Json>();
 
-  return drinkDetailObj
-      .map<DrinkDetail>((json) => DrinkDetail.fromJson(json))
-      .toList();
+  return drinkDetailObj.map<Drink>((json) => Drink.fromJson(json)).toList();
 }
